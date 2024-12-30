@@ -1,6 +1,6 @@
 from supabase_client import supabase
 from fastapi import APIRouter, HTTPException, Query
-from schemas.photocards import PhotocardSet
+from schemas.photocards import PhotocardSet, PhotocardsRelease
 
 from datetime import date
 from utils import get_image_url
@@ -24,11 +24,21 @@ def get_photocards_of_release(
         raise HTTPException(status_code=400, detail="release_id null")
 
     #post processing
-    data = []
-    for set in response.data:
-        set['release_img'] = get_image_url('AlbumCovers', f"{release_id}_albumcover")
-        for j, pc in enumerate(set['photocards']):
-            set['photocards'][j]['pc_img'] = get_image_url("Photocards", f"{set['photocards'][j]['pc_id']}_pc")
-        data.append(PhotocardSet(**set))
+    data = {}
+    if response.data:
+        #mapping the release information
+        data = PhotocardsRelease(**response.data[0], release_img=get_image_url('AlbumCovers', f"{release_id}_albumcover"))
+
+        #mapping the sets
+        for set in response.data:
+            #set['release_img'] = get_image_url('AlbumCovers', f"{release_id}_albumcover")
+            for j, pc in enumerate(set['photocards']):
+                set['photocards'][j]['pc_img'] = get_image_url("Photocards", f"{set['photocards'][j]['pc_id']}_pc")
+            data.photocard_sets.append(PhotocardSet(**set))
+    else:
+        response = supabase.table("releases").select("*, ...groups(group_name)").eq('release_id',release_id).execute()
+        if not response.data:
+            raise HTTPException(status_code=400, detail="release not found")
+        data = PhotocardsRelease(**response.data[0], release_img=get_image_url('AlbumCovers', f"{release_id}_albumcover"))
 
     return data

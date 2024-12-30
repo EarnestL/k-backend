@@ -10,9 +10,12 @@ class PhotocardBase(BaseModel):
 
 class PhotocardSet(BaseModel):
     title: str
+    photocards: List[PhotocardBase] = []
+
+class PhotocardsRelease(BaseModel):
     group_name: str
     release_title: str
     release_date: Optional[str] = None
     release_img: str
-    photocards: List[PhotocardBase] = []
+    photocard_sets: List[PhotocardSet] = []
 
