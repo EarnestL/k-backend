@@ -47,3 +47,20 @@ def get_recent_albums(
 
             data.append(AlbumBase(**release, album_image=album_image, artist_name=artist_name, artist_n_name=artist_n_name, artist_banner=artist_banner)) 
     return data
+
+#return release details
+@router.get("/release/{release_id}")
+def get_recent_albums(
+    release_id: str
+):
+    query = (
+        "*"
+    )
+    response = supabase.table("releases").select(query).eq('release_id',release_id).execute()
+
+    if not response.data:
+        raise HTTPException(status_code=400, detail="album not found")
+
+    data = response.data[0]
+    return data
+    
