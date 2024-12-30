@@ -6,7 +6,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://localhost:3000", "http://localhost:3000", "https://k-atalog.vercel.app/"],  # Replace with your domains
+    allow_origins=["https://localhost:3000", "http://localhost:3000", "https://k-atalog.vercel.app"],  # Replace with your domains
     allow_credentials=True,  # Enable cookies or authentication headers if needed
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # Allow all headers (e.g., Authorization, Content-Type)
