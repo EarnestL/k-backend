@@ -1,6 +1,6 @@
 from supabase_client import supabase
 from fastapi import APIRouter, HTTPException, Query
-from schemas.photocards import PhotocardSet, PhotocardsRelease
+from schemas.photocards import PhotocardSet, PhotocardsRelease, PhotocardBase
 
 from datetime import date
 from utils import get_image_url
@@ -16,10 +16,21 @@ def get_photocards_of_release(
     query = (
         "title:product_ver, photocards: product_id(*, ...idols(idol_name, idol_id)), ...releases(...groups(group_name), release_title, release_date)"
     )
-
+    #  "title": "R Version",
+    #   "photocards": [
+    #     {
+    #       "pc_id": "2eec20b9-2ebf-42f7-b541-076f01cb688e",
+    #       "pc_img": "https://vaglxhgjytdxtthvvsqa.supabase.co/storage/v1/object/KBucket/Photocards/2eec20b9-2ebf-42f7-b541-076f01cb688e_pc.jpg",
+    #       "idol_id": "136ee8d9-b27a-4df7-9027-04fedf6cb1b8",
+    #       "idol_name": "Kang Taehyun",
+    #       "description": "taehyun r",
+    #       "source_description": null
+    #     },
     response = None
+    newResponse = None
     if release_id:
         response = supabase.table("products").select(query).eq('release_id',release_id).execute()
+        newResponse = supabase.table("photocards"). select('*, ...products(product_ver), ...idols(idol_name), ...releases(release_title, release_date, ...groups(group_name))').eq('release_id', release_id).execute()
     else:
         raise HTTPException(status_code=400, detail="release_id null")
 
@@ -27,14 +38,40 @@ def get_photocards_of_release(
     data = {}
     if response.data:
         #mapping the release information
-        data = PhotocardsRelease(**response.data[0], release_img=get_image_url('AlbumCovers', f"{release_id}_albumcover"))
+        data = PhotocardsRelease(**newResponse.data[0], release_img=get_image_url('AlbumCovers', f"{release_id}_albumcover"))
 
-        #mapping the sets
-        for set in response.data:
-            #set['release_img'] = get_image_url('AlbumCovers', f"{release_id}_albumcover")
-            for j, pc in enumerate(set['photocards']):
-                set['photocards'][j]['pc_img'] = get_image_url("Photocards", f"{set['photocards'][j]['pc_id']}_pc")
-            data.photocard_sets.append(PhotocardSet(**set))
+        standard_sets = {}
+        special_sets = {}
+
+        standard_set_names = []
+        special_set_names = []
+
+        #mapping the pc sets
+        for card in newResponse.data:
+            card['pc_img'] = get_image_url('Photocards', f"{card['pc_id']}_pc")
+            if card['source_type'] == 'product':
+                if card['product_ver'] not in standard_sets:
+                    standard_sets[f"{card['product_ver']}"] = [card]
+                    standard_set_names.append(card['product_ver'])
+                else:
+                    standard_sets[f"{card['product_ver']}"].append(card)
+            elif card['source_type'] == 'other':
+                if card['source_description'] not in special_sets:
+                    special_sets[f"{card['source_description']}"] = [card]
+                    special_set_names.append(card['source_description'])
+                else:
+                    special_sets[f"{card['source_description']}"].append(card)
+
+        #mapping card sets
+        for set_name in standard_set_names:
+            data.photocard_sets.append(PhotocardSet(title=set_name, photocards=standard_sets[set_name]))
+
+        #combine and map the special card sets
+        for name in special_set_names:
+            for card in special_sets[name]:
+                data.special_photocard_sets.append(PhotocardBase(**card))
+        
+        return data
     else:
         response = supabase.table("releases").select("*, ...groups(group_name)").eq('release_id',release_id).execute()
         if not response.data:

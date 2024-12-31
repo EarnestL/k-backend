@@ -7,6 +7,7 @@ class PhotocardBase(BaseModel):
     idol_id: str
     idol_name: str
     description: Optional[str] = None
+    source_description: Optional[str] = None
 
 class PhotocardSet(BaseModel):
     title: str
@@ -18,4 +19,6 @@ class PhotocardsRelease(BaseModel):
     release_date: Optional[str] = None
     release_img: str
     photocard_sets: List[PhotocardSet] = []
+    special_photocard_sets: List[PhotocardBase] = []
+
 
