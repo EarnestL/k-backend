@@ -7,3 +7,4 @@ class SearchBase(BaseModel):
     n_name: Optional[str] = None
     image_uri: Optional[str] = None
     obj_type: str
+    release_type: Optional[str] = None

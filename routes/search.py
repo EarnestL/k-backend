@@ -16,7 +16,7 @@ def general_search(search_query: str = None):
     response = []
     if limit:
         response = supabase.table("releases").select(
-            "id:release_id, name:release_title, ...groups(n_name:normalized_group_name)"
+            "id:release_id, name:release_title, release_type, ...groups(n_name:normalized_group_name)"
         ).ilike("release_title", f"%{search_query}%").limit(limit).execute()
 
     #post processing
