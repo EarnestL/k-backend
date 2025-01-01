@@ -14,7 +14,7 @@ def get_photocards_of_release(
 ):
     #data query
     query = (
-        "title:product_ver, photocards: product_id(*, ...idols(idol_name, idol_id)), ...releases(...groups(group_name, group_normalized_name), release_title, release_date)"
+        "title:product_ver, photocards: product_id(*, ...idols(idol_name, idol_id)), ...releases(...groups(group_name), release_title, release_date)"
     )
     response = None
     newResponse = None
