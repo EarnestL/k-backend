@@ -16,7 +16,7 @@ def get_recent_albums(
     #query    
     query = (
         "release_id, release_title, release_type, release_date, product_count,"
-        "...idols(idol_id, idol_name), ...groups(group_id, group_name, normalized_group_name)"
+        "...idols(idol_id, idol_name, normalized_idol_name), ...groups(group_id, group_name, normalized_group_name)"
     )
     if group_id:
         response = supabase.table("releases").select(query).eq('group_id',group_id).order('release_date', desc=True).execute()
@@ -30,13 +30,12 @@ def get_recent_albums(
     if response.data:
         for release in response.data:
             #additional processing for dealing with normalized name query
-            print(release['normalized_group_name'])
             if group_n_name and release['normalized_group_name'] != group_n_name:
                 continue
 
             artist_name = ''
             artist_banner = ''
-            artist_n_name = '' if not release['normalized_group_name'] else release['normalized_group_name']
+            artist_n_name = release['normalized_idol_name'] if not release['normalized_group_name'] else release['normalized_group_name']
             album_image = get_image_url("AlbumCovers", f"{release['release_id']}_albumcover")
             if release['release_type'] == 'solo':
                 artist_banner = get_image_url("ArtistBanners", f"{release['idol_id']}_banner")

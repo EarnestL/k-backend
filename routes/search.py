@@ -16,7 +16,7 @@ def general_search(search_query: str = None):
     response = []
     if limit:
         response = supabase.table("releases").select(
-            "id:release_id, name:release_title, release_type, ...groups(n_name:normalized_group_name)"
+            "id:release_id, name:release_title, release_type, ...groups(normalized_group_name), ...idols(normalized_idol_name)"
         ).ilike("release_title", f"%{search_query}%").limit(limit).execute()
 
     #post processing
@@ -24,7 +24,8 @@ def general_search(search_query: str = None):
         for release in response.data:
             image_uri = get_image_url("AlbumCovers", f"{release['id']}_albumcover")
             obj_type = "release"
-            data.append(SearchBase(**release, image_uri=image_uri, obj_type=obj_type))
+            n_name = release['normalized_group_name'] if release['release_type']=='group' else release['normalized_idol_name']
+            data.append(SearchBase(**release, image_uri=image_uri, obj_type=obj_type, n_name=n_name))
         limit -= len(data)
 
     ################################################# group search

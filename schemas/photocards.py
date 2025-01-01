@@ -4,8 +4,9 @@ from typing import Optional, List
 class PhotocardBase(BaseModel):
     pc_id: str
     pc_img: str
-    idol_id: str
-    idol_name: str
+    group_photo: bool
+    idol_id: Optional[str] = None
+    idol_name: Optional[str] = None
     description: Optional[str] = None
     source_description: Optional[str] = None
 
@@ -14,7 +15,7 @@ class PhotocardSet(BaseModel):
     photocards: List[PhotocardBase] = []
 
 class PhotocardsRelease(BaseModel):
-    group_name: str
+    artist_name: str
     release_title: str
     release_date: Optional[str] = None
     release_img: str
