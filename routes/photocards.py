@@ -14,18 +14,8 @@ def get_photocards_of_release(
 ):
     #data query
     query = (
-        "title:product_ver, photocards: product_id(*, ...idols(idol_name, idol_id)), ...releases(...groups(group_name), release_title, release_date)"
+        "title:product_ver, photocards: product_id(*, ...idols(idol_name, idol_id)), ...releases(...groups(group_name, group_normalized_name), release_title, release_date)"
     )
-    #  "title": "R Version",
-    #   "photocards": [
-    #     {
-    #       "pc_id": "2eec20b9-2ebf-42f7-b541-076f01cb688e",
-    #       "pc_img": "https://vaglxhgjytdxtthvvsqa.supabase.co/storage/v1/object/KBucket/Photocards/2eec20b9-2ebf-42f7-b541-076f01cb688e_pc.jpg",
-    #       "idol_id": "136ee8d9-b27a-4df7-9027-04fedf6cb1b8",
-    #       "idol_name": "Kang Taehyun",
-    #       "description": "taehyun r",
-    #       "source_description": null
-    #     },
     response = None
     newResponse = None
     if release_id:
