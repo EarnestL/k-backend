@@ -25,7 +25,7 @@ def get_photocards_of_release(
     if response.data:
         #mapping the release information
         artist_name = response.data[0]['group_name'] if response.data[0]['release_type']=='group' else response.data[0]['idol_name']
-        data = PhotocardsRelease(**response.data[0], artist_name=artist_name, release_img=get_image_url('AlbumCovers', f"{release_id}_albumcover"))
+        data = PhotocardsRelease(**response.data[0], artist_name=artist_name, release_img=get_image_url('AlbumCovers', f"{release_id}_albumcover"), present_members=['all'])
 
         standard_sets = {}
         special_sets = {}
@@ -48,6 +48,10 @@ def get_photocards_of_release(
                     special_set_names.append(card['source_description'])
                 else:
                     special_sets[f"{card['source_description']}"].append(card)
+            
+            #storing members
+            if card['idol_name'] and card['idol_name'] not in data.present_members:
+                data.present_members.append(card['idol_name'])
         
         #mapping card sets
         for set_name in standard_set_names:
