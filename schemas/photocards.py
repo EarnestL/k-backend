@@ -19,6 +19,7 @@ class PhotocardsRelease(BaseModel):
     release_title: str
     release_date: Optional[str] = None
     release_img: str
+    release_type: Optional[str] = None
     present_members: List[str] = []
     photocard_sets: List[PhotocardSet] = []
     special_photocard_sets: List[PhotocardBase] = []
